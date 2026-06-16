@@ -15,6 +15,7 @@ function App() {
   const [dataSelecionada, setDataSelecionada] = useState(null)
   const [equipaAtual, setEquipaAtual] = useState(null)
   const [viewPresencaSwipe, setViewPresencaSwipe] = useState(false)
+  const [numeroTreino, setNumeroTreino] = useState(null)
 
   useEffect(() => {
     const checkTeam = async () => {
@@ -82,7 +83,7 @@ function App() {
     return (
       <PresencaSwipe
         user={user}
-        treino={treinoSelecionado}
+        treino={treinoSelecionado} numeroTreino={numeroTreino}
         equipa={equipaAtual}
         dataSelecionada={dataSelecionada}
         onVoltar={() => {
@@ -97,7 +98,7 @@ function App() {
     return (
       <TreinoDetalhes
         user={user}
-        treino={treinoSelecionado}
+        treino={treinoSelecionado} numeroTreino={numeroTreino}
         equipa={equipaAtual}
         dataSelecionada={dataSelecionada}
         onVoltar={() => setTreinoSelecionado(null)}
@@ -109,10 +110,11 @@ function App() {
     <Dashboard 
       user={user} 
       onLogout={handleLogout}
-      onTreinoSelecionado={(treino, data, equipa) => {
+      onTreinoSelecionado={(treino, data, equipa, numero) => {
         setTreinoSelecionado(treino)
         setDataSelecionada(data)
         setEquipaAtual(equipa)
+        setNumeroTreino(numero)
       }}
       onPresencaSwipe={() => setViewPresencaSwipe(true)}
     />

@@ -2,10 +2,12 @@ import { useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
 
 export const Login = ({ onLoginSuccess }) => {
+  const [isSignUp, setIsSignUp] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [passwordConfirm, setPasswordConfirm] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const { login, loading, error } = useAuth()
+  const { login, signup, loading, error } = useAuth()
   const [localError, setLocalError] = useState('')
 
   const validateForm = () => {
@@ -30,6 +32,11 @@ export const Login = ({ onLoginSuccess }) => {
       setLocalError('Password deve ter pelo menos 6 caracteres')
       return false
     }
+
+    if (isSignUp && password !== passwordConfirm) {
+      setLocalError('As passwords não correspondem')
+      return false
+    }
     
     return true
   }
@@ -40,10 +47,14 @@ export const Login = ({ onLoginSuccess }) => {
     if (!validateForm()) return
 
     try {
-      await login(email, password)
+      if (isSignUp) {
+        await signup(email, password)
+      } else {
+        await login(email, password)
+      }
       onLoginSuccess()
     } catch (err) {
-      setLocalError(err.message || 'Erro ao fazer login')
+      setLocalError(err.message || 'Erro ao processar')
     }
   }
 
@@ -109,19 +120,40 @@ export const Login = ({ onLoginSuccess }) => {
             </div>
           </div>
 
+          {/* Confirm Password Input (Sign Up) */}
+          {isSignUp && (
+            <div>
+              <label htmlFor="passwordConfirm" className="block text-sm font-medium text-gray-700 mb-2">
+                Confirmar Password
+              </label>
+              <input
+                id="passwordConfirm"
+                type={showPassword ? 'text' : 'password'}
+                value={passwordConfirm}
+                onChange={(e) => setPasswordConfirm(e.target.value)}
+                placeholder="••••••"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                disabled={loading}
+              />
+            </div>
+          )}
+
           {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}
             className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium py-2.5 rounded-lg transition duration-200 mt-6"
           >
-            {loading ? 'Entrando...' : 'Entrar'}
+            {loading ? (isSignUp ? 'Criando...' : 'Entrando...') : (isSignUp ? 'Criar Conta' : 'Entrar')}
           </button>
         </form>
 
         {/* Footer */}
         <p className="text-center text-gray-500 text-sm mt-6">
-          Não tens conta? <span className="text-blue-600 cursor-pointer">Cria uma aqui</span>
+          {isSignUp ? 'Já tens conta? ' : 'Não tens conta? '} 
+          <span onClick={() => { setIsSignUp(!isSignUp); setLocalError(''); setPassword(''); setPasswordConfirm(''); }} className="text-blue-600 cursor-pointer font-medium hover:underline">
+            {isSignUp ? 'Entra aqui' : 'Cria uma aqui'}
+          </span>
         </p>
       </div>
     </div>

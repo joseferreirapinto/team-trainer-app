@@ -49,6 +49,24 @@ export const useAuth = () => {
     }
   }
 
+  const signup = async (email, password) => {
+    setLoading(true)
+    setError(null)
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      })
+      if (error) throw error
+      return data
+    } catch (err) {
+      setError(err.message)
+      throw err
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const logout = async () => {
     setLoading(true)
     setError(null)
@@ -68,6 +86,7 @@ export const useAuth = () => {
     loading,
     error,
     login,
+    signup,
     logout,
   }
 }

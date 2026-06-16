@@ -5,6 +5,7 @@ import { Login } from './components/Login'
 import { CreateTeam } from './components/CreateTeam'
 import { Dashboard } from './components/Dashboard'
 import { TreinoDetalhes } from './components/TreinoDetalhes'
+import { PresencaSwipe } from './components/PresencaSwipe'
 
 function App() {
   const { user, loading, logout } = useAuth()
@@ -13,6 +14,7 @@ function App() {
   const [treinoSelecionado, setTreinoSelecionado] = useState(null)
   const [dataSelecionada, setDataSelecionada] = useState(null)
   const [equipaAtual, setEquipaAtual] = useState(null)
+  const [viewPresencaSwipe, setViewPresencaSwipe] = useState(false)
 
   useEffect(() => {
     const checkTeam = async () => {
@@ -75,12 +77,27 @@ function App() {
     )
   }
 
-  // If logged in with team, show Dashboard or TreinoDetalhes
+  // If logged in with team, show Dashboard or TreinoDetalhes or PresencaSwipe
+  if (viewPresencaSwipe && treinoSelecionado) {
+    return (
+      <PresencaSwipe
+        user={user}
+        treino={treinoSelecionado} numeroTreino={numero}
+        equipa={equipaAtual}
+        dataSelecionada={dataSelecionada}
+        onVoltar={() => {
+          setViewPresencaSwipe(false)
+          setTreinoSelecionado(null)
+        }}
+      />
+    )
+  }
+
   if (treinoSelecionado) {
     return (
       <TreinoDetalhes
         user={user}
-        treino={treinoSelecionado}
+        treino={treinoSelecionado} numeroTreino={numero}
         equipa={equipaAtual}
         dataSelecionada={dataSelecionada}
         onVoltar={() => setTreinoSelecionado(null)}
@@ -92,11 +109,12 @@ function App() {
     <Dashboard 
       user={user} 
       onLogout={handleLogout}
-      onTreinoSelecionado={(treino, data, equipa) => {
+      onTreinoSelecionado={(treino, data, equipa, numero) => {
         setTreinoSelecionado(treino)
         setDataSelecionada(data)
         setEquipaAtual(equipa)
       }}
+      onPresencaSwipe={() => setViewPresencaSwipe(true)}
     />
   )
 }

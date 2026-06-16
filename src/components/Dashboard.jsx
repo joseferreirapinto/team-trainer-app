@@ -63,16 +63,51 @@ export const Dashboard = ({ user, onLogout, onTreinoSelecionado, onPresencaSwipe
 
   // ===== VISTA DIA =====
   
-  const obterNumerTreinoGlobal = (treino) => {
-    // Ordenar treinos por dia_semana e contar quantos vêm antes
-    const treinosOrdenados = [...diasTreino].sort((a, b) => a.dia_semana - b.dia_semana)
-    const index = treinosOrdenados.findIndex(t => t.id === treino.id)
-    return index + 1
+  const obterNumerTreinoGlobal = (treino, dataSelecionada, equipa, todosTreinos = diasTreino) => {
+    const origem = new Date(equipa.criado_em)
+    
+    // Data real = data selecionada
+    const dataRealTreino = new Date(dataSelecionada)
+    
+    console.log('===DEBUG===')
+    console.log('Treino:', treino.dia_semana, 'ID:', treino.id)
+    console.log('Data real:', dataRealTreino.toISOString().split('T')[0])
+    console.log('Origem:', origem.toISOString().split('T')[0])
+    
+    // Contar treinos desde origem até data real
+    let numero = 0
+    const treinosOrdenados = [...todosTreinos].sort((a, b) => a.dia_semana - b.dia_semana)
+    
+    console.log('Treinos ordenados:', treinosOrdenados.map(t => ({ dia: t.dia_semana, id: t.id })))
+    
+    // Iterar por cada dia desde origem até data real
+    let data = new Date(origem)
+    while (data <= dataRealTreino) {
+      const diaSemanaAtual = (data.getDay() + 6) % 7
+      const treinoHoje = treinosOrdenados.find(t => t.dia_semana === diaSemanaAtual)
+      
+      console.log('Data:', data.toISOString().split('T')[0], 'DiaSemana:', diaSemanaAtual, 'Treino?:', treinoHoje ? 'SIM' : 'NÃO')
+      
+      if (treinoHoje) {
+        numero++
+        console.log('  Contando... numero=', numero, 'ID deste:', treinoHoje.id, 'ID procurado:', treino.id)
+        
+        if (data.toDateString() === dataRealTreino.toDateString() && treinoHoje.id === treino.id) {
+          console.log('  ENCONTRADO! Retornando:', numero)
+          return numero
+        }
+      }
+      
+      data.setDate(data.getDate() + 1)
+    }
+    
+    console.log('Saiu do loop. numero=', numero)
+    return Math.max(1, numero)
   }
 
   const renderizarVistaDia = () => {
     const diaSemana = obterDiaSemana(dataSelecionada)
-    const treinosDoDia = diasTreino.filter(d => d.dia_semana === diaSemana)
+    const treinosDoDia = diasTreino.filter(d => d.dia_semana === diaSemana && podeExibirTreinoNaData(dataSelecionada))
     const temTreino = treinosDoDia.length > 0
 
     return (
@@ -98,11 +133,11 @@ export const Dashboard = ({ user, onLogout, onTreinoSelecionado, onPresencaSwipe
           {temTreino ? (
             <div className="space-y-2">
               {treinosDoDia.map(treino => (
-                <div key={treino.id} onClick={() => onTreinoSelecionado(treino, dataSelecionada, equipa)} className="bg-white border border-gray-200 p-4 md:p-5 rounded-lg cursor-pointer hover:shadow-lg hover:border-blue-300 transition">
+                <div key={treino.id} onClick={() => onTreinoSelecionado(treino, dataSelecionada, equipa, obterNumerTreinoGlobal(treino, dataSelecionada, equipa, diasTreino))} className="bg-white border border-gray-200 p-4 md:p-5 rounded-lg cursor-pointer hover:shadow-lg hover:border-blue-300 transition">
                   {/* Header: Data e Hora */}
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <p className="text-xs text-gray-600 uppercase">Treino #{obterNumerTreinoGlobal(treino)}</p>
+                      <p className="text-xs text-gray-600 uppercase">Treino #{obterNumerTreinoGlobal(treino, dataSelecionada, equipa, diasTreino)}</p>
                       <p className="font-semibold text-gray-900">{formatarData(dataSelecionada)}</p>
                     </div>
                     <div className="text-right">
@@ -195,14 +230,14 @@ export const Dashboard = ({ user, onLogout, onTreinoSelecionado, onPresencaSwipe
 
         <div>
           <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-3">Treinos da Semana</h3>
-          {diasTreino.filter(t => t.dia_semana === obterDiaSemana(dataSelecionada)).length > 0 ? (
+          {diasTreino.filter(t => t.dia_semana === obterDiaSemana(dataSelecionada) && podeExibirTreinoNaData(dataSelecionada)).length > 0 ? (
             <div className="space-y-2">
-              {diasTreino.filter(t => t.dia_semana === obterDiaSemana(dataSelecionada)).map((treino, index) => (
-                <div key={treino.id} onClick={() => onTreinoSelecionado(treino, dataSelecionada, equipa)} className="bg-white border border-gray-200 p-4 md:p-5 rounded-lg cursor-pointer hover:shadow-lg hover:border-blue-300 transition">
+              {diasTreino.filter(t => t.dia_semana === obterDiaSemana(dataSelecionada) && podeExibirTreinoNaData(dataSelecionada)).map((treino, index) => (
+                <div key={treino.id} onClick={() => onTreinoSelecionado(treino, dataSelecionada, equipa, obterNumerTreinoGlobal(treino, dataSelecionada, equipa, diasTreino))} className="bg-white border border-gray-200 p-4 md:p-5 rounded-lg cursor-pointer hover:shadow-lg hover:border-blue-300 transition">
                   {/* Header: Data e Hora */}
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <p className="text-xs text-gray-600 uppercase">Treino #{obterNumerTreinoGlobal(treino)}</p>
+                      <p className="text-xs text-gray-600 uppercase">Treino #{obterNumerTreinoGlobal(treino, dataSelecionada, equipa, diasTreino)}</p>
                       <p className="font-semibold text-gray-900">{formatarData(dataSelecionada)}</p>
                     </div>
                     <div className="text-right">
@@ -257,7 +292,8 @@ export const Dashboard = ({ user, onLogout, onTreinoSelecionado, onPresencaSwipe
       diasMês.push({ data: d, outroMes: true })
     }
     for (let i = 1; i <= ultimo.getDate(); i++) {
-      diasMês.push({ data: new Date(ano, mes, i), outroMes: false })
+      const d = new Date(ano, mes, i, 12, 0, 0) // Adiciona meio-dia para evitar timezone offset
+      diasMês.push({ data: d, outroMes: false })
     }
     const diasRestantes = 42 - diasMês.length
     for (let i = 1; i <= diasRestantes; i++) {
@@ -290,14 +326,13 @@ export const Dashboard = ({ user, onLogout, onTreinoSelecionado, onPresencaSwipe
 
         <div>
           <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-3">Treinos do Mês</h3>
-          {diasTreino.filter(t => t.dia_semana === obterDiaSemana(dataSelecionada)).length > 0 ? (
+          {diasTreino.filter(t => t.dia_semana === obterDiaSemana(dataSelecionada) && podeExibirTreinoNaData(dataSelecionada)).length > 0 ? (
             <div className="space-y-2">
-              {diasTreino.filter(t => t.dia_semana === obterDiaSemana(dataSelecionada)).map((treino, index) => (
-                <div key={treino.id} onClick={() => onTreinoSelecionado(treino, dataSelecionada, equipa)} className="bg-white border border-gray-200 p-4 md:p-5 rounded-lg cursor-pointer hover:shadow-lg hover:border-blue-300 transition">
-                  {/* Header: Data e Hora */}
+              {diasTreino.filter(t => t.dia_semana === obterDiaSemana(dataSelecionada) && podeExibirTreinoNaData(dataSelecionada)).map((treino) => (
+                <div key={treino.id} onClick={() => onTreinoSelecionado(treino, dataSelecionada, equipa, obterNumerTreinoGlobal(treino, dataSelecionada, equipa, diasTreino))} className="bg-white border border-gray-200 p-4 md:p-5 rounded-lg cursor-pointer hover:shadow-lg hover:border-blue-300 transition">
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <p className="text-xs text-gray-600 uppercase">Treino #{obterNumerTreinoGlobal(treino)}</p>
+                      <p className="text-xs text-gray-600 uppercase">Treino #{obterNumerTreinoGlobal(treino, dataSelecionada, equipa, diasTreino)}</p>
                       <p className="font-semibold text-gray-900">{formatarData(dataSelecionada)}</p>
                     </div>
                     <div className="text-right">
@@ -305,8 +340,6 @@ export const Dashboard = ({ user, onLogout, onTreinoSelecionado, onPresencaSwipe
                       <p className="font-semibold text-gray-900">{treino.hora}</p>
                     </div>
                   </div>
-
-                  {/* Info: Equipa e Escalão */}
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <div>
                       <p className="text-xs text-gray-600 uppercase">Equipa</p>
@@ -317,14 +350,10 @@ export const Dashboard = ({ user, onLogout, onTreinoSelecionado, onPresencaSwipe
                       <p className="font-semibold text-gray-900 text-sm">{equipa?.escalao || '—'}</p>
                     </div>
                   </div>
-
-                  {/* Duração */}
                   <div className="mb-4 p-3 bg-blue-50 rounded-lg">
                     <p className="text-xs text-gray-600 uppercase">Duração</p>
                     <p className="font-semibold text-gray-900">{treino.duracao} min</p>
                   </div>
-
-                  {/* Botão */}
                   <button onClick={onPresencaSwipe} className="w-full px-4 py-2 bg-blue-600 text-white rounded font-medium hover:bg-blue-700 transition">👆 Marcar Presença</button>
                 </div>
               ))}
@@ -339,6 +368,12 @@ export const Dashboard = ({ user, onLogout, onTreinoSelecionado, onPresencaSwipe
 
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-white"><p className="text-gray-500">Carregando...</p></div>
   if (!equipa) return <div className="min-h-screen flex items-center justify-center bg-white"><p className="text-gray-500">Erro: Equipa não encontrada</p></div>
+
+  const dataEquipaCriada = new Date(equipa.criado_em)
+  
+  const podeExibirTreinoNaData = (data) => {
+    return data >= dataEquipaCriada
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20 md:pb-0">

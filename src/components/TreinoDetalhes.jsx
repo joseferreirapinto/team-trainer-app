@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 
-export const TreinoDetalhes = ({ user, treino, equipa, dataSelecionada, onVoltar }) => {
+export const TreinoDetalhes = ({ user, treino, equipa, dataSelecionada, numeroTreino, onVoltar }) => {
   const [jogadores, setJogadores] = useState([])
   const [presencas, setPresencas] = useState({})
   const [loading, setLoading] = useState(true)
@@ -176,7 +176,7 @@ export const TreinoDetalhes = ({ user, treino, equipa, dataSelecionada, onVoltar
             ←
           </button>
           <div className="flex-1">
-            <p className="text-sm text-gray-600">Detalhes do Treino</p>
+            <p className="text-sm text-gray-600">{`Treino #${numeroTreino} - Detalhes`}</p>
             <p className="text-lg md:text-xl font-semibold text-gray-900">{formatarData(dataSelecionada)} às {treino.hora}</p>
           </div>
         </div>

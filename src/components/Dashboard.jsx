@@ -9,7 +9,7 @@ const MESES = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
 const obterDiaSemana = (data) => (data.getDay() + 6) % 7
 
 export const Dashboard = ({ user, onLogout, onTreinoSelecionado, onPresencaSwipe }) => {
-  const [aba, setAba] = useState('mes')
+  const [aba, setAba] = useState('semana')
   const [dataSelecionada, setDataSelecionada] = useState(new Date())
   const [equipa, setEquipa] = useState(null)
   const [diasTreino, setDiasTreino] = useState([])

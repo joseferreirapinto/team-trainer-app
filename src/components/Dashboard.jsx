@@ -63,33 +63,11 @@ export const Dashboard = ({ user, onLogout, onTreinoSelecionado, onPresencaSwipe
 
   // ===== VISTA DIA =====
   
-  const obterNumeroDiaSemanà = (diaSemanaDia) => {
-    return diasTreino.filter(t => t.dia_semana < diaSemanaDia).length + 1
-  }
-
   const obterNumerTreinoGlobal = (treino) => {
-    // Calcular data de cada treino baseado no dia da semana
-    const hoje = new Date()
-    const diaHoje = hoje.getDay()
-    
-    // Converter dia da semana (0=Dom) para nosso formato (0=Seg, 6=Dom)
-    const formatoNosso = (diaHoje + 6) % 7
-    
-    // Calcular a data do treino nesta semana
-    const diasAtras = (formatoNosso - treino.dia_semana + 7) % 7
-    const dataTreino = new Date(hoje)
-    dataTreino.setDate(dataTreino.getDate() - diasAtras)
-    
-    // Contar quantos treinos há desde sempre até agora
-    const treinosAntigos = diasTreino.filter(t => {
-      const dataT = new Date(hoje)
-      const diasAtrasT = (formatoNosso - t.dia_semana + 7) % 7
-      dataT.setDate(dataT.getDate() - diasAtrasT)
-      
-      return dataT < dataTreino || (dataT.getTime() === dataTreino.getTime() && t.dia_semana < treino.dia_semana)
-    }).length
-    
-    return treinosAntigos + 1
+    // Ordenar treinos por dia_semana e contar quantos vêm antes
+    const treinosOrdenados = [...diasTreino].sort((a, b) => a.dia_semana - b.dia_semana)
+    const index = treinosOrdenados.findIndex(t => t.id === treino.id)
+    return index + 1
   }
 
   const renderizarVistaDia = () => {

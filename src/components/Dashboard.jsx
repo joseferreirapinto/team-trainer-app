@@ -62,6 +62,36 @@ export const Dashboard = ({ user, onLogout, onTreinoSelecionado, onPresencaSwipe
   }
 
   // ===== VISTA DIA =====
+  
+  const obterNumeroDiaSemanà = (diaSemanaDia) => {
+    return diasTreino.filter(t => t.dia_semana < diaSemanaDia).length + 1
+  }
+
+  const obterNumerTreinoGlobal = (treino) => {
+    // Calcular data de cada treino baseado no dia da semana
+    const hoje = new Date()
+    const diaHoje = hoje.getDay()
+    
+    // Converter dia da semana (0=Dom) para nosso formato (0=Seg, 6=Dom)
+    const formatoNosso = (diaHoje + 6) % 7
+    
+    // Calcular a data do treino nesta semana
+    const diasAtras = (formatoNosso - treino.dia_semana + 7) % 7
+    const dataTreino = new Date(hoje)
+    dataTreino.setDate(dataTreino.getDate() - diasAtras)
+    
+    // Contar quantos treinos há desde sempre até agora
+    const treinosAntigos = diasTreino.filter(t => {
+      const dataT = new Date(hoje)
+      const diasAtrasT = (formatoNosso - t.dia_semana + 7) % 7
+      dataT.setDate(dataT.getDate() - diasAtrasT)
+      
+      return dataT < dataTreino || (dataT.getTime() === dataTreino.getTime() && t.dia_semana < treino.dia_semana)
+    }).length
+    
+    return treinosAntigos + 1
+  }
+
   const renderizarVistaDia = () => {
     const diaSemana = obterDiaSemana(dataSelecionada)
     const treinosDoDia = diasTreino.filter(d => d.dia_semana === diaSemana)
@@ -94,7 +124,7 @@ export const Dashboard = ({ user, onLogout, onTreinoSelecionado, onPresencaSwipe
                   {/* Header: Data e Hora */}
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <p className="text-xs text-gray-600 uppercase">Treino #{index + 1}</p>
+                      <p className="text-xs text-gray-600 uppercase">Treino #{obterNumerTreinoGlobal(treino)}</p>
                       <p className="font-semibold text-gray-900">{formatarData(dataSelecionada)}</p>
                     </div>
                     <div className="text-right">
@@ -194,7 +224,7 @@ export const Dashboard = ({ user, onLogout, onTreinoSelecionado, onPresencaSwipe
                   {/* Header: Data e Hora */}
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <p className="text-xs text-gray-600 uppercase">Treino #{index + 1}</p>
+                      <p className="text-xs text-gray-600 uppercase">Treino #{obterNumerTreinoGlobal(treino)}</p>
                       <p className="font-semibold text-gray-900">{formatarData(dataSelecionada)}</p>
                     </div>
                     <div className="text-right">
@@ -289,7 +319,7 @@ export const Dashboard = ({ user, onLogout, onTreinoSelecionado, onPresencaSwipe
                   {/* Header: Data e Hora */}
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <p className="text-xs text-gray-600 uppercase">Treino #{index + 1}</p>
+                      <p className="text-xs text-gray-600 uppercase">Treino #{obterNumerTreinoGlobal(treino)}</p>
                       <p className="font-semibold text-gray-900">{formatarData(dataSelecionada)}</p>
                     </div>
                     <div className="text-right">

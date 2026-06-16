@@ -94,7 +94,7 @@ export const Dashboard = ({ user, onLogout, onTreinoSelecionado, onPresencaSwipe
                   {/* Header: Data e Hora */}
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <p className="text-sm text-gray-600">Data</p>
+                      <p className="text-xs text-gray-600 uppercase">Treino #{index + 1}</p>
                       <p className="font-semibold text-gray-900">{formatarData(dataSelecionada)}</p>
                     </div>
                     <div className="text-right">
@@ -189,12 +189,12 @@ export const Dashboard = ({ user, onLogout, onTreinoSelecionado, onPresencaSwipe
           <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-3">Treinos da Semana</h3>
           {diasTreino.filter(t => t.dia_semana === obterDiaSemana(dataSelecionada)).length > 0 ? (
             <div className="space-y-2">
-              {diasTreino.filter(t => t.dia_semana === obterDiaSemana(dataSelecionada)).map(treino => (
+              {diasTreino.filter(t => t.dia_semana === obterDiaSemana(dataSelecionada)).map((treino, index) => (
                 <div key={treino.id} onClick={() => onTreinoSelecionado(treino, dataSelecionada, equipa)} className="bg-white border border-gray-200 p-4 md:p-5 rounded-lg cursor-pointer hover:shadow-lg hover:border-blue-300 transition">
                   {/* Header: Data e Hora */}
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <p className="text-sm text-gray-600">Data</p>
+                      <p className="text-xs text-gray-600 uppercase">Treino #{index + 1}</p>
                       <p className="font-semibold text-gray-900">{formatarData(dataSelecionada)}</p>
                     </div>
                     <div className="text-right">
@@ -284,12 +284,12 @@ export const Dashboard = ({ user, onLogout, onTreinoSelecionado, onPresencaSwipe
           <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-3">Treinos do Mês</h3>
           {diasTreino.filter(t => t.dia_semana === obterDiaSemana(dataSelecionada)).length > 0 ? (
             <div className="space-y-2">
-              {diasTreino.filter(t => t.dia_semana === obterDiaSemana(dataSelecionada)).map(treino => (
+              {diasTreino.filter(t => t.dia_semana === obterDiaSemana(dataSelecionada)).map((treino, index) => (
                 <div key={treino.id} onClick={() => onTreinoSelecionado(treino, dataSelecionada, equipa)} className="bg-white border border-gray-200 p-4 md:p-5 rounded-lg cursor-pointer hover:shadow-lg hover:border-blue-300 transition">
                   {/* Header: Data e Hora */}
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <p className="text-sm text-gray-600">Data</p>
+                      <p className="text-xs text-gray-600 uppercase">Treino #{index + 1}</p>
                       <p className="font-semibold text-gray-900">{formatarData(dataSelecionada)}</p>
                     </div>
                     <div className="text-right">
